@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/midi-writer-js/browser/midi-writer-js.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@700&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
+    <style>
+      .controls {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+      }
+
+      .file-input-wrapper {
+        display: inline-block;
+        position: relative;
+        margin-right: 10px;
+      }
+
+      .file-input-wrapper input[type="file"] {
+        display: none;
+      }
+
+      .file-input-wrapper label,
+      select {
+        padding: 8px 16px;
+        background: black;
+        color: white;
+        border: 2px solid white;
+        font-family: 'Noto Sans', sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .file-input-wrapper label:hover,
+      select:hover {
+        background: white;
+        color: black;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-right: 30px;
+      }
+
+      select:focus {
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="controls">
+      <div class="file-input-wrapper">
+        <label for="audioFile">Choose File</label>
+        <input type="file" id="audioFile" accept="audio/*" />
+      </div>
+      <select id="presetFiles">
+        <option value="">Select Preset</option>
+        <option value="1.wav">Sound 1</option>
+        <option value="2.wav">Sound 2</option>
+        <option value="3.wav">Sound 3</option>
+        <!-- Add more options as needed -->
+      </select>
+    </div>
+    <main>
+    </main>
+    <script src="sketch.js"></script>
+  </body>
+</html>
