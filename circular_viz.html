@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/midi-writer-js/browser/midi-writer-js.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whale Sound Circular Visualization</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.js"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <meta charset="utf-8" />
-    <title>Scully2MIDI - Whale Sound Analyzer</title>
+    <script src="sketch_circular_viz.js"></script>
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #000;
+        font-family: "Noto Sans", sans-serif;
+        color: white;
+      }
       .controls {
         position: fixed;
         top: 10px;
@@ -31,7 +38,6 @@
         gap: 8px;
         max-width: 180px;
       }
-
       select {
         width: 100%;
         padding: 5px 8px;
@@ -45,36 +51,13 @@
         cursor: pointer;
         transition: all 0.3s ease;
       }
-
       select:hover {
         background: #444;
       }
-
       select:focus {
         outline: none;
         border-color: #888;
       }
-
-      .info {
-        position: fixed;
-        bottom: 10px;
-        left: 10px;
-        color: white;
-        font-family: "Noto Sans", sans-serif;
-        font-size: 12px;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 5px 8px;
-        border-radius: 4px;
-      }
-
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #000;
-        font-family: "Noto Sans", sans-serif;
-      }
-
       canvas {
         display: block;
       }
@@ -89,27 +72,23 @@
         display: flex;
         align-items: center;
       }
-
       .toggle-label {
         margin-right: 6px;
         font-size: 12px;
         color: white;
         font-family: "Noto Sans", sans-serif;
       }
-
       .toggle-switch {
         position: relative;
         display: inline-block;
         width: 32px;
         height: 16px;
       }
-
       .toggle-switch input {
         opacity: 0;
         width: 0;
         height: 0;
       }
-
       .toggle-slider {
         position: absolute;
         cursor: pointer;
@@ -121,7 +100,6 @@
         transition: 0.4s;
         border-radius: 16px;
       }
-
       .toggle-slider:before {
         position: absolute;
         content: "";
@@ -133,11 +111,9 @@
         transition: 0.4s;
         border-radius: 50%;
       }
-
       input:checked + .toggle-slider {
         background-color: #2196f3;
       }
-
       input:checked + .toggle-slider:before {
         transform: translateX(16px);
       }
@@ -200,6 +176,10 @@
         margin-right: 4px;
       }
     </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="controls">
@@ -219,16 +199,9 @@
           </label>
         </div>
       </div>
-      <a href="circular_viz.html" class="viz-link">
-        <i class="fas fa-circle-notch"></i> Circular View
+      <a href="index.html" class="viz-link">
+        <i class="fas fa-bars"></i> Main View
       </a>
     </div>
-
-    <div class="info">
-      <i class="fas fa-info-circle"></i> MIDI when recording enabled
-    </div>
-
-    <main></main>
-    <script src="sketch.js"></script>
   </body>
 </html>

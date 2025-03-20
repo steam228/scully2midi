@@ -1,0 +1,39 @@
+{
+  "sounds": [
+    {
+      "filename": "KillerWhale_100Hz.wav", 
+      "name": "Killer Whale Pod J",
+      "species": "Orcinus orca",
+      "date": "2023-03-15",
+      "location": "Vestmannaeyjar, Iceland"
+    },
+    {
+      "filename": "HumpbackSong.wav",
+      "name": "Humpback Whale Song",
+      "species": "Megaptera novaeangliae",
+      "date": "2023-05-20",
+      "location": "Azores Archipelago, Portugal"
+    },
+    {
+      "filename": "BlueWhaleCall.wav",
+      "name": "Blue Whale Call",
+      "species": "Balaenoptera musculus",
+      "date": "2023-06-12",
+      "location": "Tromsø, Northern Norway"
+    },
+    {
+      "filename": "BelugaPod.wav",
+      "name": "Beluga Whale Pod",
+      "species": "Delphinapterus leucas",
+      "date": "2023-01-08",
+      "location": "Lofoten Islands, Norway"
+    },
+    {
+      "filename": "SpermWhaleClicks.wav",
+      "name": "Sperm Whale Clicks",
+      "species": "Physeter macrocephalus",
+      "date": "2023-07-25",
+      "location": "São Miguel, Azores"
+    }
+  ]
+} 

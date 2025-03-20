@@ -13,8 +13,9 @@ let loadedSounds = [];
 
 // Note streaming visualization variables
 let noteHistory = []; // Array to store note history for visualization
-const MAX_NOTE_HISTORY = 500; // Increased to allow more notes on screen
-const NOTE_STREAM_MARGIN = 10; // Margin from edges
+const MAX_NOTE_HISTORY = 20; // Max number of notes to display in history
+const NOTE_STREAM_HEIGHT = 200; // Height of the note stream area
+const NOTE_STREAM_MARGIN = 20; // Margin from edges
 
 // Color palette for notes - using shades of blue instead of multicolored
 const noteColors = {
@@ -54,18 +55,13 @@ const noteFrequencies = {
 
 // All possible notes across all octaves (for note stream visualization)
 let allPossibleNotes = [];
-let notesPerOctave = 0;
-let minOctave = 4; // Start from octave 4 instead of 0 (removing lower 4 octaves)
-let maxOctave = 8; // End at octave 8 for better vertical spacing
 
 // Function to initialize all possible notes for visualization
 function initializePossibleNotes() {
   allPossibleNotes = [];
   const noteNames = Object.keys(noteFrequencies);
-  notesPerOctave = noteNames.length;
 
-  // Only use octaves 4-8 for visualization (we'll still record all octaves)
-  for (let octave = minOctave; octave <= maxOctave; octave++) {
+  for (let octave = 0; octave < 9; octave++) {
     for (let i = 0; i < noteNames.length; i++) {
       allPossibleNotes.push(`${noteNames[i]}${octave}`);
     }
@@ -382,8 +378,8 @@ function draw() {
   freq = Math.round(peaks[0] * binWidth);
   let musicalNote = findClosestNote(freq);
 
-  // Draw full-screen note stream visualization
-  drawFullScreenNoteViz();
+  // Draw circular visualization
+  drawCircularVisualization(spectrum, soundWave);
 
   // Display frequency and note info in bottom right
   drawFrequencyInfo(freq, musicalNote);
@@ -408,23 +404,13 @@ function draw() {
           // Complete the previous note
           lastNote.duration = now - lastNoteTime;
           if (lastNote.duration > 0) {
-            // Create a new object for the note
-            const noteObj = {
+            midiNotes.push({
               midi: lastNote.midi,
               velocity: lastNote.velocity,
               time: lastNote.time,
               note: lastNote.note,
               duration: lastNote.duration,
-              visualStartTime: millis(), // For visualization timing
-            };
-
-            midiNotes.push(noteObj);
-            noteHistory.push(noteObj); // Add to visualization history
-
-            // Keep note history at a reasonable size
-            if (noteHistory.length > MAX_NOTE_HISTORY) {
-              noteHistory.shift();
-            }
+            });
 
             console.log("Note recorded:", lastNote);
           }
@@ -463,92 +449,71 @@ function draw() {
   }
 }
 
-function drawFullScreenNoteViz() {
-  // Calculate note height based on the number of notes we're showing
-  const noteHeight = height / allPossibleNotes.length;
+function drawCircularVisualization(spectrum, soundWave) {
+  push();
+  translate(width / 2, height / 2);
 
-  // Draw grid lines for octaves
-  stroke(40);
-  strokeWeight(1);
-  for (let i = 0; i <= maxOctave - minOctave + 1; i++) {
-    const y = map(i * notesPerOctave, 0, allPossibleNotes.length, height, 0);
-    line(0, y, width, y);
-  }
+  // Create a scaling factor to make the visualization smaller
+  const scaleFactor = 0.7; // Reduce size by 30%
+  scale(scaleFactor);
 
-  // Draw subtle horizontal lines for each note
-  stroke(20);
-  strokeWeight(0.5);
-  for (let i = 0; i < allPossibleNotes.length; i++) {
-    const y = map(i, 0, allPossibleNotes.length, height, 0);
-    line(0, y, width, y);
-  }
-
-  // Draw note bars
-  noStroke();
-
-  const now = millis();
-  const noteLifespan = 10000; // How long notes stay visible in ms
-
-  for (let i = 0; i < noteHistory.length; i++) {
-    const note = noteHistory[i];
-    if (!note) continue;
-
-    // Skip notes outside our visualization range
-    const noteOctave = parseInt(note.note.match(/\d+/)[0]);
-    if (noteOctave < minOctave || noteOctave > maxOctave) continue;
-
-    // Calculate age of note for sliding effect
-    const noteAge = now - note.visualStartTime;
-    if (noteAge > noteLifespan) continue; // Skip notes that are too old
-
-    // Calculate horizontal position based on age - right to left
-    const xPosition = map(
-      noteAge,
-      0,
-      noteLifespan,
-      width - NOTE_STREAM_MARGIN,
-      NOTE_STREAM_MARGIN
+  // Draw spectrum in light blue with semicircle arrangement
+  stroke(150, 180, 230);
+  strokeWeight(2);
+  // Upper semicircle
+  beginShape();
+  for (let i = 0; i <= 180; i++) {
+    let index = floor(
+      map(constrain(i, 0, 180), 0, 180, 0, spectrum.length - 1)
     );
-
-    // Get the note and octave
-    const noteName = note.note.replace(/\d+/g, "");
-    const octave = parseInt(note.note.match(/\d+/)[0]);
-
-    // Map the note's position using the allPossibleNotes array
-    const noteIndex = allPossibleNotes.findIndex((n) => n === note.note);
-    const yPosition = map(
-      noteIndex,
-      0,
-      allPossibleNotes.length - 1,
-      0,
-      height - noteHeight
-    );
-
-    // Calculate width based on duration (capped to prevent super wide bars)
-    const maxWidth = width / 3;
-    const barWidth = min(map(note.duration, 0, 2000, 20, maxWidth), maxWidth);
-
-    // Get note color based on note name (without octave)
-    const noteColor = noteColors[noteName] || [140, 170, 210]; // Default to a blue-grey if not found
-
-    // Draw the note bar with color based on note
-    fill(
-      noteColor[0],
-      noteColor[1],
-      noteColor[2],
-      map(noteAge, 0, noteLifespan, 230, 50)
-    );
-    rect(xPosition - barWidth, yPosition, barWidth, noteHeight);
-
-    // Add note name text with white font for better visibility
-    if (barWidth > 30) {
-      // Only show text for longer notes
-      fill(255); // White text
-      textSize(min(noteHeight * 0.8, 20));
-      textAlign(CENTER, CENTER);
-      text(note.note, xPosition - barWidth / 2, yPosition + noteHeight / 2);
-    }
+    let r = map(spectrum[index], 0, 255, 150, 450);
+    let x = r * sin(i);
+    let y = -r * cos(i);
+    vertex(x, y);
   }
+  endShape();
+
+  // Lower semicircle (mirrored)
+  beginShape();
+  for (let i = 0; i <= 180; i++) {
+    let index = floor(
+      map(constrain(i, 0, 180), 0, 180, 0, spectrum.length - 1)
+    );
+    let r = map(spectrum[index], 0, 255, 150, 450);
+    let x = r * -sin(i);
+    let y = r * cos(i);
+    vertex(x, y);
+  }
+  endShape();
+
+  // Draw waveform in darker blue
+  stroke(70, 100, 150);
+  // Right semicircle
+  beginShape();
+  for (let i = 0; i <= 180; i++) {
+    let index = floor(
+      map(constrain(i, 0, 180), 0, 180, 0, soundWave.length - 1)
+    );
+    let r = map(soundWave[index], -1, 1, 100, 400);
+    let x = r * sin(i);
+    let y = r * cos(i);
+    vertex(x, y);
+  }
+  endShape();
+  // Left semicircle (mirrored)
+  beginShape();
+  for (let i = 0; i <= 180; i++) {
+    let index = floor(
+      map(constrain(i, 0, 180), 0, 180, 0, soundWave.length - 1)
+    );
+    let r = map(soundWave[index], -1, 1, 100, 400);
+    let x = r * -sin(i);
+    let y = r * cos(i);
+    vertex(x, y);
+  }
+  endShape();
+
+  pop();
 }
 
 function drawFrequencyInfo(freq, musicalNote) {
@@ -629,6 +594,7 @@ function mouseClicked() {
 
   // Get UI elements positions to avoid triggering on clicks in those areas
   const controls = document.querySelector(".controls");
+
   if (controls) {
     const rect = controls.getBoundingClientRect();
     if (
@@ -642,10 +608,6 @@ function mouseClicked() {
   }
 
   togglePlayback();
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
 }
 
 // Function to toggle playback
@@ -711,4 +673,8 @@ function togglePlayback() {
   } catch (error) {
     console.error("Error handling playback:", error);
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
